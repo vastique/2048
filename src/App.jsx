@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-const TILE_SIZE = 80;
+const TILE_SIZE = 100;
 const GAP = 12;
 const SLIDE_MS = 110; // slide transition duration
 
@@ -305,19 +305,20 @@ export default function App() {
     makeMove(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
   };
 
-  const boardSize = 4 * TILE_SIZE + 3 * GAP; // 356px
+  const boardSize = 4 * TILE_SIZE + 3 * GAP; // 436px
   const boardPad = 12;
+  const boardOuterSize = boardSize + 2 * boardPad; // 460px — used as the shared width for header/controls/panels
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center py-6 px-4"
-      style={{ background: '#faf8ef' }}
+      className="min-h-screen flex flex-col items-center justify-center py-6 px-4"
+      style={{ background: '#1a1a1a' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       {/* Header */}
-      <div className="w-full max-w-md flex items-center justify-between mb-3">
-        <h1 className="text-5xl font-extrabold" style={{ color: '#776e65', letterSpacing: '-2px' }}>2048</h1>
+      <div className="flex items-center justify-between mb-3" style={{ width: boardOuterSize }}>
+        <h1 className="text-5xl font-extrabold" style={{ color: '#f9f6f2', letterSpacing: '-2px' }}>2048</h1>
         <div className="flex gap-2">
           <ScoreBox label="SCORE" value={score} />
           <ScoreBox label="BEST"  value={bestScore} />
@@ -325,7 +326,7 @@ export default function App() {
       </div>
 
       {/* Controls row */}
-      <div className="w-full max-w-md flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4" style={{ width: boardOuterSize }}>
         <div className="flex gap-2">
           <button
             onClick={() => setShowInstructions(v => !v)}
@@ -356,7 +357,7 @@ export default function App() {
 
       {/* Instructions */}
       {showInstructions && (
-        <div className="w-full max-w-md rounded-lg p-4 mb-4 text-sm" style={{ background: '#eee4da', color: '#776e65' }}>
+        <div className="panel-enter rounded-lg p-4 mb-4 text-sm" style={{ width: boardOuterSize, background: '#3c3a32', color: '#eee4da' }}>
           <p className="font-bold mb-1">How to play</p>
           <p>Use <strong>arrow keys</strong> or <strong>WASD</strong> to slide tiles. When two tiles with the same number touch, they <strong>merge</strong>!</p>
           <p className="mt-1">Reach the <strong>2048 tile</strong> to win. Keep going for a higher score!</p>
@@ -367,6 +368,7 @@ export default function App() {
       {/* High Scores Panel */}
       {showHighScores && (
         <HighScoresPanel
+          width={boardOuterSize}
           highScores={highScores}
           onClose={() => setShowHighScores(false)}
           onClear={() => setShowClearConfirm(true)}
@@ -377,7 +379,7 @@ export default function App() {
       <div
         className="relative rounded-lg"
         style={{
-          background: '#bbada0',
+          background: '#3c3a32',
           padding: boardPad,
           touchAction: 'none',
           userSelect: 'none',
@@ -386,7 +388,7 @@ export default function App() {
         {/* Background grid cells */}
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(4, ${TILE_SIZE}px)`, gap: GAP }}>
           {Array(16).fill(null).map((_, i) => (
-            <div key={i} style={{ width: TILE_SIZE, height: TILE_SIZE, background: '#cdc1b4', borderRadius: 6 }} />
+            <div key={i} style={{ width: TILE_SIZE, height: TILE_SIZE, background: '#2a2826', borderRadius: 6 }} />
           ))}
         </div>
 
@@ -398,9 +400,9 @@ export default function App() {
         {/* Game Over overlay */}
         {gameOver && (
           <div className="absolute inset-0 rounded-lg flex flex-col items-center justify-center"
-            style={{ background: 'rgba(238,228,218,0.73)' }}>
-            <p className="text-4xl font-extrabold mb-2" style={{ color: '#776e65' }}>Game Over!</p>
-            <p className="text-lg font-semibold mb-4" style={{ color: '#776e65' }}>Score: {score}</p>
+            style={{ background: 'rgba(15,15,15,0.78)' }}>
+            <p className="text-4xl font-extrabold mb-2" style={{ color: '#f9f6f2' }}>Game Over!</p>
+            <p className="text-lg font-semibold mb-4" style={{ color: '#eee4da' }}>Score: {score}</p>
             <button onClick={startNewGame} className="px-6 py-2 rounded-lg font-bold text-white"
               style={{ background: '#8f7a66' }}>Try Again</button>
           </div>
@@ -434,8 +436,8 @@ export default function App() {
       {showNameModal && (
         <Modal>
           <div className="p-6 flex flex-col items-center gap-4" style={{ minWidth: 280 }}>
-            <p className="text-xl font-extrabold" style={{ color: '#776e65' }}>High Score!</p>
-            <p className="text-sm text-center" style={{ color: '#776e65' }}>
+            <p className="text-xl font-extrabold" style={{ color: '#f9f6f2' }}>High Score!</p>
+            <p className="text-sm text-center" style={{ color: '#eee4da' }}>
               Score of <strong>{pendingScore?.score}</strong> made the top 10!
             </p>
             <input
@@ -445,13 +447,13 @@ export default function App() {
               onChange={e => setPlayerName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && submitHighScore()}
               className="w-full px-3 py-2 rounded border text-center font-semibold"
-              style={{ borderColor: '#bbada0', color: '#776e65', outline: 'none' }}
+              style={{ background: '#1a1a1a', borderColor: '#4e4a3f', color: '#f9f6f2', outline: 'none' }}
             />
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowNameModal(false); setPlayerName(''); setPendingScore(null); }}
                 className="px-4 py-2 rounded font-semibold text-sm"
-                style={{ background: '#cdc1b4', color: '#776e65' }}
+                style={{ background: '#4e4a3f', color: '#eee4da' }}
               >Skip</button>
               <button onClick={submitHighScore} className="px-4 py-2 rounded font-bold text-sm"
                 style={{ background: '#8f7a66', color: '#f9f6f2' }}>Save</button>
@@ -464,11 +466,11 @@ export default function App() {
       {showClearConfirm && (
         <Modal>
           <div className="p-6 flex flex-col items-center gap-4" style={{ minWidth: 260 }}>
-            <p className="text-lg font-bold" style={{ color: '#776e65' }}>Clear all scores?</p>
+            <p className="text-lg font-bold" style={{ color: '#f9f6f2' }}>Clear all scores?</p>
             <p className="text-sm" style={{ color: '#a09080' }}>This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowClearConfirm(false)} className="px-4 py-2 rounded font-semibold text-sm"
-                style={{ background: '#cdc1b4', color: '#776e65' }}>Cancel</button>
+                style={{ background: '#4e4a3f', color: '#eee4da' }}>Cancel</button>
               <button onClick={clearHighScores} className="px-4 py-2 rounded font-bold text-sm"
                 style={{ background: '#f65e3b', color: '#f9f6f2' }}>Clear</button>
             </div>
@@ -485,7 +487,7 @@ export default function App() {
 function Tile({ tile }) {
   const [x, y] = tileXY(tile.row, tile.col);
   const { bg, fg } = tileColors(tile.value);
-  const fontSize = tile.value >= 1024 ? 20 : tile.value >= 128 ? 24 : 28;
+  const fontSize = tile.value >= 1024 ? 26 : tile.value >= 128 ? 32 : 36;
 
   return (
     <div
@@ -520,8 +522,8 @@ function Tile({ tile }) {
 function ScoreBox({ label, value }) {
   return (
     <div className="flex flex-col items-center px-3 py-1 rounded-md min-w-[60px]"
-      style={{ background: '#bbada0' }}>
-      <span className="text-xs font-bold tracking-widest" style={{ color: '#eee4da' }}>{label}</span>
+      style={{ background: '#3c3a32' }}>
+      <span className="text-xs font-bold tracking-widest" style={{ color: '#bbada0' }}>{label}</span>
       <span className="text-lg font-extrabold leading-tight" style={{ color: '#f9f6f2' }}>{value}</span>
     </div>
   );
@@ -530,22 +532,22 @@ function ScoreBox({ label, value }) {
 function Modal({ children }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.4)' }}>
-      <div className="rounded-xl shadow-2xl" style={{ background: '#faf8ef' }}>{children}</div>
+      style={{ background: 'rgba(0,0,0,0.6)' }}>
+      <div className="rounded-xl shadow-2xl" style={{ background: '#2a2826' }}>{children}</div>
     </div>
   );
 }
 
-function HighScoresPanel({ highScores, onClose, onClear }) {
+function HighScoresPanel({ width, highScores, onClose, onClear }) {
   return (
-    <div className="w-full max-w-md rounded-xl p-4 mb-4" style={{ background: '#eee4da' }}>
+    <div className="panel-enter rounded-xl p-4 mb-4" style={{ width, background: '#3c3a32' }}>
       <div className="flex items-center justify-between mb-3">
-        <span className="font-extrabold text-base" style={{ color: '#776e65' }}>High Scores</span>
+        <span className="font-extrabold text-base" style={{ color: '#f9f6f2' }}>High Scores</span>
         <div className="flex gap-2">
           <button onClick={onClear} className="text-xs px-2 py-1 rounded font-semibold"
             style={{ background: '#f65e3b', color: '#f9f6f2' }}>Clear</button>
           <button onClick={onClose} className="text-xs px-2 py-1 rounded font-semibold"
-            style={{ background: '#bbada0', color: '#f9f6f2' }}>Close</button>
+            style={{ background: '#8f7a66', color: '#f9f6f2' }}>Close</button>
         </div>
       </div>
       {highScores.length === 0 ? (
@@ -564,8 +566,8 @@ function HighScoresPanel({ highScores, onClose, onClear }) {
           <tbody>
             {highScores.map((e, i) => (
               <tr key={i} style={{
-                background: i === 0 ? 'rgba(237,194,46,0.25)' : 'transparent',
-                fontWeight: i === 0 ? 700 : 400, color: '#776e65',
+                background: i === 0 ? 'rgba(237,194,46,0.18)' : 'transparent',
+                fontWeight: i === 0 ? 700 : 400, color: '#eee4da',
               }}>
                 <td className="py-0.5 pr-2">{i === 0 ? '🏆' : `${i+1}.`}</td>
                 <td className="py-0.5 max-w-[80px] truncate">{e.name}</td>
